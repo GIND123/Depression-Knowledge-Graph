@@ -1,12 +1,13 @@
 
 ---
-title: 'Gala: A Python package for galactic dynamics'
+title: "MalaKG: A Python toolkit for longitudinal knowledge-graph construction from Malayalam mental-health conversations"
 tags:
   - Python
-  - astronomy
-  - dynamics
-  - galactic dynamics
-  - milky way
+  - natural language processing
+  - mental health
+  - knowledge graphs
+  - low-resource languages
+  - computational social science
 authors:
   - name: Govind Arun
     orcid: 0000-0000-0000-0000
@@ -24,226 +25,56 @@ authors:
   - name: Aditya Mohanty
     corresponding: true # (This is how to denote the corresponding author)
     affiliation: 5
-
 affiliations:
- - name: Lyman Spitzer, Jr. Fellow, Princeton University, United States
-   index: 1
-   ror: 00hx57361
- - name: Institution Name, Country
-   index: 2
- - name: Independent Researcher, Country
-   index: 3
-date: 13 August 2017
+  - index: 1
+    name: Independent Researcher, India
+  - index: 2
+    name: Independent Researcher, United States
+  - index: 3
+    name: Independent Researcher, India
+date: 11 January 2026
 bibliography: paper.bib
-
-# Optional fields if submitting to a AAS journal too, see this blog post:
-# https://blog.joss.theoj.org/2018/12/a-new-collaboration-with-aas-publishing
-aas-doi: 10.3847/xxxxx <- update this with the DOI from AAS once you know it.
-aas-journal: Astrophysical Journal <- The name of the AAS journal.
 ---
 
 # Summary
 
-The forces on stars, galaxies, and dark matter under external gravitational
-fields lead to the dynamical evolution of structures in the universe. The orbits
-of these bodies are therefore key to understanding the formation, history, and
-future state of galaxies. The field of "galactic dynamics," which aims to model
-the gravitating components of galaxies to study their structure and evolution,
-is now well-established, commonly taught, and frequently used in astronomy.
-Aside from toy problems and demonstrations, the majority of problems require
-efficient numerical tools, many of which require the same base code (e.g., for
-performing numerical orbit integration).
+Natural language interactions are increasingly used in research settings to study mental health, wellbeing, and emotional trajectories over time. However, most existing computational approaches treat conversations as isolated text samples, producing static predictions that are difficult to interpret longitudinally. This limitation is particularly acute for low-resource languages, where culturally grounded expressions of distress are under-represented in standard benchmarks.
+
+`MalaKG` is an open-source Python package for constructing and updating **dynamic, session-level knowledge graphs** from conversational text in Malayalam. The toolkit integrates multilingual transformer-based classifiers, rule-based linguistic signals, and graph-based aggregation to represent evolving indicators such as hope, distress, and symptom mentions across turns and sessions. By converting free-text dialogue into structured, temporally indexed graphs, `MalaKG` enables researchers to analyze conversational mental-health signals in a transparent and extensible manner without requiring access to proprietary platforms or large-scale clinical infrastructure.
 
 # Statement of need
 
-`Gala` is an Astropy-affiliated Python package for galactic dynamics. Python
-enables wrapping low-level languages (e.g., C) for speed without losing
-flexibility or ease-of-use in the user-interface. The API for `Gala` was
-designed to provide a class-based and user-friendly interface to fast (C or
-Cython-optimized) implementations of common operations such as gravitational
-potential and force evaluation, orbit integration, dynamical transformations,
-and chaos indicators for nonlinear dynamics. `Gala` also relies heavily on and
-interfaces well with the implementations of physical units and astronomical
-coordinate systems in the `Astropy` package [@astropy] (`astropy.units` and
-`astropy.coordinates`).
+Research in computational mental health increasingly relies on conversational data from interviews, chat-based assessments, and digital interventions. While transformer-based classifiers can detect sentiment or risk at the utterance level, these outputs are often difficult to contextualize across time, sessions, or individuals. Existing tools typically return point estimates (e.g., sentiment labels or scores) without retaining the intermediate structure required for longitudinal analysis, auditability, or downstream integration with qualitative research workflows.
 
-`Gala` was designed to be used by both astronomical researchers and by
-students in courses on gravitational dynamics or astronomy. It has already been
-used in a number of scientific publications [@Pearson:2017] and has also been
-used in graduate courses on Galactic dynamics to, e.g., provide interactive
-visualizations of textbook material [@Binney:2008]. The combination of speed,
-design, and support for Astropy functionality in `Gala` will enable exciting
-scientific explorations of forthcoming data releases from the *Gaia* mission
-[@gaia] by students and experts alike.
+This gap is especially relevant for **low-resource and non-English languages**, where culturally specific expressions of distress may not align cleanly with dominant annotation schemes. `MalaKG` addresses this need by providing a reusable software framework that (i) incrementally updates a knowledge graph after each conversational turn, (ii) preserves turn-level evidence alongside session-level summaries, and (iii) exposes intermediate representations that can be inspected, visualized, or exported for further analysis. The target users include researchers in computational social science, digital mental-health research, human–computer interaction, and NLP practitioners working with under-represented languages.
+
+# State of the field
+
+A number of libraries support sentiment analysis, emotion classification, or mental-health risk prediction from text, often through pre-trained neural models. Separately, general-purpose graph libraries enable the construction of static knowledge graphs from structured inputs. However, existing tools rarely integrate **conversational NLP, temporal aggregation, and knowledge-graph construction** within a single, reusable research software package.
+
+Moreover, many mental-health NLP pipelines are released as notebooks or model checkpoints, limiting reproducibility and extension. `MalaKG` adopts a different design philosophy: rather than proposing a new predictive model, it focuses on **software infrastructure** that links model outputs, linguistic rules, and temporal structure into a coherent graph representation. This design choice supports comparative research (e.g., swapping classifiers or rules), facilitates error analysis, and lowers the barrier for studying longitudinal conversational patterns in low-resource settings.
 
 # Software design
 
-`Gala`'s design philosophy is based on three core principles: (1) to provide a
- user-friendly, modular, object-oriented API, (2) to use community tools and 
- standards (e.g., Astropy for coordinates and units handling), and (3) to use
- low-level code (C/C++/Cython) for performance while keeping the user interface
- in Python. Within each of the main subpackages in `gala` (`gala.potential`, 
- `gala.dynamics`, `gala.integrate`, etc.), we try to maintain a consistent API 
- for classes and functions. For example, all potential classes share a common 
- base class and implement methods for computing the potential, forces, density, 
- and other derived quantities at given positions. This also works for 
- compositions of potentials (i.e., multi-component potential models), which 
- share the potential base class but also act as a dictionary-like container for 
- different potential components. As another example, all integrators implement a 
- common interface for numerically integrating orbits. The integrators and core 
- potential functions are all implemented in C without support for units, but the 
- Python layer handles unit conversions and prepares data to dispatch to the C 
- layer appropriately.Within the coordinates subpackage, we extend Astropy's 
- coordinate classes to add more specialized coordinate frames and 
- transformations that are relevant for Galactic dynamics and Milky Way research.
+`MalaKG` is implemented as a modular Python package with a clear separation between inference, graph construction, and analysis layers. Transformer-based text classifiers (e.g., XLM-RoBERTa models fine-tuned for sentiment, hope-related speech, or risk buckets) are wrapped behind a consistent prediction interface. Optional rule-based components capture language-specific symptom cues that may be missed by statistical models.
+
+Each conversational turn is processed independently and then merged into a session-level knowledge graph, where nodes represent entities such as turns, symptoms, or inferred states, and edges encode temporal order and evidential relationships. The graph is updated incrementally as new turns arrive, allowing real-time or batch-style analysis using the same abstractions. The package supports export to standard formats (JSON and GraphML) to enable visualization and downstream processing with external tools.
+
+Design trade-offs prioritize transparency and extensibility over end-to-end automation. Rather than hiding intermediate steps, `MalaKG` exposes model confidences, rule hits, and aggregation logic, allowing researchers to audit and adapt the pipeline to new domains, languages, or ethical constraints.
 
 # Research impact statement
 
-`Gala` has demonstrated significant research impact and grown both its user base 
-and contributor community since its initial release. The package has evolved 
-through contributions from over 18 developers beyond the original core developer 
-(@adrn), with community members adding new features, reporting bugs, and 
-suggesting new features. 
+`MalaKG` is intended as enabling infrastructure for research on conversational mental-health analysis in low-resource languages. The package provides reproducible examples, documented APIs, and end-to-end scripts that demonstrate how dynamic knowledge graphs can be derived from real conversational data. While the software is at an early stage of public release, it is designed to support comparative experiments, methodological studies, and interdisciplinary collaborations that combine qualitative and quantitative analysis.
 
-While `Gala` started as a tool primarily to support the core developer's 
-research, it has expanded organically to support a range of applications across 
-domains in astrophysics related to Milky Way and galactic dynamics. The package 
-has been used in over 400 publications (according to Google Scholar) spanning 
-topics in galactic dynamics such as modeling stellar streams [@Pearson:2017], 
-Milky Way mass modeling, and interpreting kinematic and stellar population 
-trends in the Galaxy. `Gala` is integrated within the Astropy ecosystem as an 
-affiliated package and has built functionality that extends the widely-used 
-`astropy.units` and `astropy.coordinates` subpackages. `Gala`'s impact extends 
-beyond citations in research: Because of its focus on usability and user 
-interface design, `Gala` has also been incorporated into graduate-level galactic 
-dynamics curricula at multiple institutions. 
-
-`Gala` has been downloaded over 100,000 times from PyPI and conda-forge yearly 
-(or ~2,000 downloads per week) over the past few years, demonstrating a broad 
-and active user community. Users span career stages from graduate students to 
-faculty and other established researchers and represent institutions around the 
-world. This broad adoption and active participation validate `Gala`'s role as 
-core community infrastructure for galactic dynamics research.
-
-# Mathematics
-
-Single dollars ($) are required for inline mathematics e.g. $f(x) = e^{\pi/x}$
-
-Double dollars make self-standing equations:
-
-$$\Theta(x) = \left\{\begin{array}{l}
-0\textrm{ if } x < 0\cr
-1\textrm{ else}
-\end{array}\right.$$
-
-You can also use plain \LaTeX for equations
-\begin{equation}\label{eq:fourier}
-\hat f(\omega) = \int_{-\infty}^{\infty} f(x) e^{i\omega x} dx
-\end{equation}
-and refer to \autoref{eq:fourier} from text.
-
-# Citations
-
-Citations to entries in paper.bib should be in
-[rMarkdown](http://rmarkdown.rstudio.com/authoring_bibliographies_and_citations.html)
-format.
-
-If you want to cite a software repository URL (e.g. something on GitHub without a preferred
-citation) then you can do it with the example BibTeX entry below for @fidgit.
-
-For a quick reference, the following citation commands can be used:
-- `@author:2001`  ->  "Author et al. (2001)"
-- `[@author:2001]` -> "(Author et al., 2001)"
-- `[@author1:2001; @author2:2001]` -> "(Author1 et al., 2001; Author2 et al., 2002)"
-
-# Figures
-
-Figures can be included like this:
-![Caption for example figure.\label{fig:example}](figure.png)
-and referenced from text using \autoref{fig:example}.
-
-Figure sizes can be customized by adding an optional second parameter:
-![Caption for example figure.](figure.png){ width=20% }
+By releasing `MalaKG` as open-source research software, we aim to facilitate transparent experimentation, encourage reuse beyond a single dataset or study, and lower the barrier for researchers interested in longitudinal and interpretable analyses of conversational mental-health signals.
 
 # AI usage disclosure
 
-No generative AI tools were used in the development of this software, the writing
-of this manuscript, or the preparation of supporting materials.
+Generative AI tools were used during development to assist with code refactoring, documentation drafting, and example generation. All AI-assisted outputs were reviewed, tested, and validated by the authors, and all architectural and design decisions were made by the human contributors.
 
 # Acknowledgements
 
-We acknowledge contributions from Brigitta Sipocz, Syrtis Major, and Semyeong
-Oh, and support from Kathryn Johnston during the genesis of this project.
+The authors acknowledge discussions with colleagues in computational social science and mental-health research that informed the design goals of this software. No external funding was received for this work.
 
 # References
-Example paper.bib file:
 
-@article{Pearson:2017,
-  	url = {http://adsabs.harvard.edu/abs/2017arXiv170304627P},
-  	Archiveprefix = {arXiv},
-  	Author = {{Pearson}, S. and {Price-Whelan}, A.~M. and {Johnston}, K.~V.},
-  	Eprint = {1703.04627},
-  	Journal = {ArXiv e-prints},
-  	Keywords = {Astrophysics - Astrophysics of Galaxies},
-  	Month = mar,
-  	Title = {{Gaps in Globular Cluster Streams: Pal 5 and the Galactic Bar}},
-  	Year = 2017
-}
-
-@book{Binney:2008,
-  	url = {http://adsabs.harvard.edu/abs/2008gady.book.....B},
-  	Author = {{Binney}, J. and {Tremaine}, S.},
-  	Booktitle = {Galactic Dynamics: Second Edition, by James Binney and Scott Tremaine.~ISBN 978-0-691-13026-2 (HB).~Published by Princeton University Press, Princeton, NJ USA, 2008.},
-  	Publisher = {Princeton University Press},
-  	Title = {{Galactic Dynamics: Second Edition}},
-  	Year = 2008
-}
-
-@article{gaia,
-    author = {{Gaia Collaboration}},
-    title = "{The Gaia mission}",
-    journal = {Astronomy and Astrophysics},
-    archivePrefix = "arXiv",
-    eprint = {1609.04153},
-    primaryClass = "astro-ph.IM",
-    keywords = {space vehicles: instruments, Galaxy: structure, astrometry, parallaxes, proper motions, telescopes},
-    year = 2016,
-    month = nov,
-    volume = 595,
-    doi = {10.1051/0004-6361/201629272},
-    url = {http://adsabs.harvard.edu/abs/2016A%26A...595A...1G},
-}
-
-@article{astropy,
-    author = {{Astropy Collaboration}},
-    title = "{Astropy: A community Python package for astronomy}",
-    journal = {Astronomy and Astrophysics},
-    archivePrefix = "arXiv",
-    eprint = {1307.6212},
-    primaryClass = "astro-ph.IM",
-    keywords = {methods: data analysis, methods: miscellaneous, virtual observatory tools},
-    year = 2013,
-    month = oct,
-    volume = 558,
-    doi = {10.1051/0004-6361/201322068},
-    url = {http://adsabs.harvard.edu/abs/2013A%26A...558A..33A}
-}
-
-@article{Hunt:2025,
-  author = {{Hunt}, Jason A.~S. and {Vasiliev}, Eugene},
-  title = {Milky Way dynamics in light of Gaia},
-  journal = {New Astronomy Reviews},
-  year = 2025,
-  volume = 98,
-  doi = {10.1016/j.newar.2024.101721},
-  url = {https://www.sciencedirect.com/science/article/pii/S1387647324000289}
-}
-
-@misc{fidgit,
-  author = {A. M. Smith and K. Thaney and M. Hahnel},
-  title = {Fidgit: An ungodly union of GitHub and Figshare},
-  year = {2020},
-  publisher = {GitHub},
-  journal = {GitHub repository},
-  url = {https://github.com/arfon/fidgit}
-}
