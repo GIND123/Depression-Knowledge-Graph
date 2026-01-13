@@ -105,13 +105,10 @@ You can run the script in two ways :
   - The system will process the input, update the graph, and generate a dashboard.    
   - Type `exi` to exit the loop.
         
-3. **Outputs**:
-    
-    - **Console Report**: Prints JSON summaries of risk, sentiment, and scores.
-        
-    - **`knowledge_graph.json`**: The full graph structure saved to disk.
-        
-    - **`dashboard_step_X.png`**: A visualization image created at each step.
+**Outputs**:
+- **Console Report**: Prints JSON summaries of risk, sentiment, and scores.
+- **`knowledge_graph.json`**: The full graph structure saved to disk.
+- **`dashboard_step_X.png`**: A visualization image created at each step.
         
 
 ## Dashboard Visualization
