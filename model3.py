@@ -19,9 +19,9 @@ load_dotenv()
 class DepressionAnalysisPipeline:
     DEFAULT_FOLDERS = {
         "repo_id": "GOVINDFROM/DepressionPipeline",
-        "hope": "xlmr_hope_malayalam",
-        "sentiment": "xlmr_malayalam_sentiment",
-        "phq": "xlmr_phq9_bucket_mock/checkpoint-150"
+        "hope": "xlmr_hope_malayalam_v2",
+        "sentiment": "xlmr_malayalam_sentiment_v2",
+        "phq": "xlmr_phq9_bucket_mock_v2/checkpoint-250"
     }
     DISTRESS_LABELS = {"negative", "negative_override"}
 
@@ -399,4 +399,5 @@ def run_chatbot(interactive=True, examples=None):
 
 if __name__ == "__main__":
     # Change to False to test automatic generation of images in /kg_store/history/
+
     run_chatbot(interactive=True)
