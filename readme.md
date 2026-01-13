@@ -79,14 +79,14 @@ A wrapper around `NetworkX` that structures the analysis data into a directed gr
 You can run the script in two ways : 
 
 ### Scenario 1: Run Interactive Mode
-	```python
+```
 	from model3 import run_chatbot
 	
 	run_chatbot(interactive=True)
-	```
+```
 
 ### Scenario 2: Run Auto Mode with Custom Sentences
-	```python
+```
 	from model3 import run_chatbot
 	my_custom_list = [
 	    "എനിക്ക് ഒന്നിലും താൽപ്പര്യമില്ല; ഒന്നും സന്തോഷം തരുന്നില്ല.",
@@ -97,7 +97,7 @@ You can run the script in two ways :
 	]
 	
 	run_chatbot(interactive=False, examples=my_custom_list)
-	```
+```
     
 **Interactive Mode**:
   - The script will prompt: `Turn 1 | You:`.  
