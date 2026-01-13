@@ -328,10 +328,10 @@ def generate_dashboard(pipeline, kg_manager, payload, step_num, show_plot=True):
     print(f"Dashboard saved: {save_path}")
 
     # Show if interactive
-    if show_plot:
-        plt.show()
-    else:
-        plt.close()
+    # if show_plot:
+    #     plt.show()
+    # else:
+    plt.close()
 
 
 # ==========================================
@@ -401,3 +401,4 @@ if __name__ == "__main__":
     # Change to False to test automatic generation of images in /kg_store/history/
 
     run_chatbot(interactive=True)
+
