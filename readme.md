@@ -4,7 +4,9 @@
 A real-time AI agent chat that analyzes patient responses to track mental health metrics. It combines three NLP pipelines (Hope, Sentiment, PHQ-9) with a **Dynamic Knowledge Graph** that evolves with every conversation turn, providing a visual dashboard of the patient's changing state.
 
 ## Features
-
+- Multi-Language Support:
+	- Malayalam & Manglish: Native support for inputs in Malayalam script (e.g., "എനിക്ക് സങ്കടമുണ്ട്") and Romanized Malayalam/Manglish (e.g., "enikku vishamam undu"), as well as English.
+  
 - **Multi-Model NLP Pipeline**:
     
     - **Hope Detection**: Identifies presence of optimism or hopelessness.
