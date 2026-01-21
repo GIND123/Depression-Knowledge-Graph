@@ -50,7 +50,7 @@ This gap is especially relevant for **low-resource and non-English languages**, 
 
 While the integration of Knowledge Graphs (KGs) with Large Language Models is established in medical AI, current methodologies predominantly treat KGs as static references rather than dynamic, evolving structures. Standard approaches, such as those combining RLHF with KG guidance \cite{Wangref1} or utilizing GraphRAG for symptom verification \cite{Guoref2}, rely on fixed standards like DSM-5 without real-time structural evolution. Extraction-focused methods further limit adaptability; MedKG \cite{Linref3} and Text-to-GraphQL systems \cite{Niref4} depend on rigid schemas and pre-constructed repositories that fail to capture the nuances of ongoing dialogue. Most temporal systems also present challenges for personalized care: while some autonomous agents track the evolution of scientific literature \cite{zhangref5}, they ignore real-time user states. Consequently, existing diagnostic frameworks \cite{yuan6} remain tethered to general clinical rules, lacking the dynamic memory required to interpret unique, unfolding patient contexts.
 
-# Software design
+# Implementation
 
 `MalaKG` is implemented as a modular Python package with a clear separation between inference, graph construction, and analysis layers. Transformer-based text classifiers (e.g., XLM-RoBERTa models fine-tuned for sentiment, hope-related speech, or risk buckets) are wrapped behind a consistent prediction interface. Optional rule-based components capture language-specific symptom cues that may be missed by statistical models.
 
