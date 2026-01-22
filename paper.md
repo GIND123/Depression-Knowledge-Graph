@@ -52,11 +52,57 @@ While the integration of Knowledge Graphs (KGs) with Large Language Models is es
 
 # Implementation
 
-`MalaKG` is implemented as a modular Python package with a clear separation between inference, graph construction, and analysis layers. Transformer-based text classifiers (e.g., XLM-RoBERTa models fine-tuned for sentiment, hope-related speech, or risk buckets) are wrapped behind a consistent prediction interface. Optional rule-based components capture language-specific symptom cues that may be missed by statistical models.
+`MalaKG` is implemented as a modular Python toolkit that integrates **transformer-based NLP classifiers**, **rule-based symptom extraction**, and **dynamic knowledge-graph management** to construct longitudinal representations of Malayalam and code-mixed mental-health conversations. The system is structured around three core components: the **analysis pipeline**, the **knowledge graph manager**, and the **dashboard generator**.
 
-Each conversational turn is processed independently and then merged into a session-level knowledge graph, where nodes represent entities such as turns, symptoms, or inferred states, and edges encode temporal order and evidential relationships. The graph is updated incrementally as new turns arrive, allowing real-time or batch-style analysis using the same abstractions. The package supports export to standard formats (JSON and GraphML) to enable visualization and downstream processing with external tools.
+### 1. Analysis Pipeline
 
-Design trade-offs prioritize transparency and extensibility over end-to-end automation. Rather than hiding intermediate steps, `MalaKG` exposes model confidences, rule hits, and aggregation logic, allowing researchers to audit and adapt the pipeline to new domains, languages, or ethical constraints.
+The `DepressionAnalysisPipeline` class orchestrates real-time processing of conversational turns. For each utterance, it performs:
+
+- **Hope speech detection** using an XLM-RoBERTa-base classifier fine-tuned on Malayalam conversations.
+- **Affective sentiment classification** via a second XLM-RoBERTa model, with deterministic overrides for explicit hopelessness phrases.
+- **Session-level PHQ-9 severity estimation**, aggregating turn-level text into a single score for depression risk.
+
+Predictions are represented as dictionaries containing labels, confidence scores, and optional probabilities for inspection. Additionally, a **symptom extraction module** identifies relevant mental-health cues such as sleep disturbances, anhedonia, fatigue, guilt, and anxiety using a curated set of lexical triggers.
+
+Turn-level outputs are fused into a **weighted distress score**, combining negative sentiment and lack of hope to provide a real-time, interpretable measure of psychological distress. The pipeline exposes both turn-level and session-level outputs for downstream graph updates.
+
+### 2. Knowledge Graph Management
+
+The `KnowledgeGraphManager` class implements a **dynamic, updatable multi-directed graph** using NetworkX. Nodes represent patients, sessions, conversational turns, signals (e.g., hope, sentiment, PHQ-9), and detected symptoms, while edges encode temporal and relational structure:
+
+- Patients → Sessions (`HAS_SESSION`)
+- Sessions → Turns (`HAS_TURN`)
+- Turns → Signals (`HAS_SIGNAL`)
+- Turns → Symptoms (`MENTIONS`)
+
+Graph updates occur incrementally with each new turn. Node properties store prediction metadata, including confidence scores and PHQ-9 buckets. Graph persistence is achieved in **JSON** and **GraphML** formats, enabling easy inspection, querying, and visualization.
+
+### 3. Dashboard Generator
+
+The toolkit provides an integrated visualization module, `generate_dashboard`, which produces a four-panel view per session:
+
+1. **Running distress score trend**, showing temporal evolution across turns.
+2. **Knowledge graph snapshot**, illustrating the current state of entities and relationships.
+3. **Hope probability bar chart**, summarizing model output for the latest turn.
+4. **PHQ-9 severity distribution**, visualizing session-level predictions.
+
+Dashboards are saved automatically per turn and optionally displayed interactively to support clinician-in-the-loop evaluation or user-facing feedback.
+
+### 4. Chatbot Simulation Interface
+
+A lightweight interface wraps the pipeline and knowledge graph manager into a **turn-based simulation**. It supports interactive or scripted conversation flows and demonstrates the incremental building of the knowledge graph. At each step, the system:
+
+1. Accepts a user utterance.
+2. Generates turn-level predictions and updates the session summary.
+3. Updates the knowledge graph with new nodes and edges.
+4. Saves the graph and generates the dashboard visualization.
+
+This design ensures that longitudinal conversational data are **preserved, auditable, and interpretable**, enabling both retrospective analysis and real-time monitoring.
+
+### 5. Dependencies and Environment
+
+The toolkit relies on standard Python scientific and NLP libraries, including `torch`, `transformers`, `networkx`, `numpy`, and `matplotlib`. Hugging Face Hub authentication is optional but allows seamless model loading. Environment variables are used to manage tokens and configuration paths.
+
 
 # Research impact statement
 
